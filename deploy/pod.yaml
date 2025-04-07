@@ -6,6 +6,7 @@ spec:
   containers:
   - name: app
     image: custom-app:latest
+    imagePullPolicy: Never
     volumeMounts:
     - name: logs-volume
       mountPath: /app/logs

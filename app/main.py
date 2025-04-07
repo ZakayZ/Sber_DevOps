@@ -2,12 +2,16 @@ import json
 import os
 import typing as tp
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 
 LOGS_FILE: tp.Final[str] = '/app/logs/app.log'
 WELCOME_MSG: tp.Final[str] = os.environ.get('WELCOME_MSG', 'Welcome to the custom app')
 LOG_LEVEL: tp.Final[str] = os.environ.get('LOG_LEVEL', 'INFO')
+
+
+with open(LOGS_FILE, 'w') as f:
+    f.write(json.dumps({'logs': 'start'}) + '\n')
 
 app = FastAPI()
 
@@ -23,9 +27,10 @@ async def get_status():
 
 
 @app.post("/log")
-async def post_logs(log: tp.Dict[str, str]):
+async def post_logs(request: Request):
+    body = await request.json()
     with open(LOGS_FILE, 'a') as f:
-        f.write(json.dumps(log) + '\n')    
+        f.write(json.dumps(body) + '\n')    
 
 
 @app.get("/logs")

@@ -15,6 +15,7 @@ spec:
       containers:
       - name: app
         image: custom-app:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
         envFrom:
@@ -25,4 +26,6 @@ spec:
           mountPath: /app/logs
       volumes:
       - name: logs-volume
-        emptyDir: {}
+        hostPath:
+          path: /var/log/custom-app
+          type: DirectoryOrCreate
