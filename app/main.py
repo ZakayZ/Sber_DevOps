@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import typing as tp
@@ -30,7 +31,13 @@ async def get_status():
 async def post_logs(request: Request):
     body = await request.json()
     with open(LOGS_FILE, 'a') as f:
-        f.write(json.dumps(body) + '\n')    
+        f.write(json.dumps(body) + '\n')
+
+
+@app.post("/log_timeout")
+async def post_logs_timeout(request: Request):
+    await asyncio.sleep(2)
+    await post_logs(request)
 
 
 @app.get("/logs")

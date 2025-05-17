@@ -1,0 +1,100 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app-virtualservice
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - main-gateway
+  http:
+    # Rewrite /api/v1/status → /status
+    - match:
+        - uri:
+            prefix: /api/v1/status
+          method:
+            exact: GET
+      rewrite:
+        uri: /status
+      route:
+        - destination:
+            host: app-service
+            port:
+              number: 80
+
+    # Rewrite /api/v1/logs → /logs
+    - match:
+        - uri:
+            exact: /api/v1/logs
+          method:
+            exact: GET
+      rewrite:
+        uri: /logs
+      route:
+        - destination:
+            host: app-service
+            port:
+              number: 80
+
+    # Rewrite /api/v1/ → /
+    - match:
+        - uri:
+            exact: /api/v1/
+          method:
+            exact: GET
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: app-service
+            port:
+              number: 80
+
+    # Rewrite /api/v1/log → /log
+    - match:
+        - uri:
+            exact: /api/v1/log
+          method:
+            exact: POST
+      rewrite:
+        uri: /log
+      route:
+        - destination:
+            host: app-service
+            port:
+              number: 80
+      timeout: 1s
+      retries:
+        attempts: 2
+      fault:
+        delay:
+          fixedDelay: 2s
+
+    # Rewrite /api/v1/log_timeout → /log_timeout
+    - match:
+        - uri:
+            exact: /api/v1/log_timeout
+          method:
+            exact: POST
+      rewrite:
+        uri: /log_timeout
+      route:
+        - destination:
+            host: app-service
+            port:
+              number: 80
+      timeout: 1s
+      retries:
+        attempts: 2
+      fault:
+        delay:
+          fixedDelay: 2s
+
+    # Global 404 for non-API routes
+    - match:
+        - uri:
+            prefix: /
+      directResponse:
+        status: 404
+        body:
+          string: "Not Found"
