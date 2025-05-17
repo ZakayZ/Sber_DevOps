@@ -14,6 +14,7 @@ minikube start
 ```
 
 Отправить запросы внутри кластера:
+
 ```shell
 kubectl run -it --rm --image=curlimages/curl test -- sh
 curl http://app-service/status
@@ -22,7 +23,16 @@ curl http://app-service/logs
 ```
 
 Посмотреть вывод log-agent:
+
 ```shell
 kubectl get pods -o wide
 kubectl logs log-agent-xxxxxxx
+```
+
+## После вклюения istio
+
+```shell
+curl http://127.0.0.1:8080/api/v1/status
+curl -X POST http://127.0.0.1:8080/api/v1/log -d '{"message": "test"}'
+curl http://127.0.0.1:8080/api/v1/logs
 ```
