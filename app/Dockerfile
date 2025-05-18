@@ -5,7 +5,7 @@ COPY . .
 
 RUN apt-get update -y
 RUN apt-get install -y python3-pip python3-dev build-essential
-RUN pip3 install --no-cache-dir --break-system-packages "fastapi[standard]"
+RUN pip3 install --no-cache-dir --break-system-packages prometheus-client "fastapi[standard]"
 
 RUN mkdir -p /app/logs && touch /app/logs/app.log
 
