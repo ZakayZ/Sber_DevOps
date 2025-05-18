@@ -8,9 +8,15 @@ minikube image load custom-app:latest
 
 echo "Setting up Istio..."
 istioctl install --set profile=demo -y
-
-echo "Adding Istio sidecar..."
 kubectl label namespace default istio-injection=enabled
+
+echo "Adding Prometheus..."
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+  --set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false
 
 echo "Applying Kubernetes manifests..."
 kubectl apply -f deploy/configmap.yaml
@@ -24,6 +30,8 @@ echo "Applying Istio manifests..."
 kubectl apply -f deploy/istio-gateway.yaml
 kubectl apply -f deploy/istio-virtualservice.yaml 
 kubectl apply -f deploy/istio-destination.yaml   
+
+kubectl apply -f deploy/service-monitor.yaml
 
 echo "Waiting for deployment to be ready..."
 kubectl rollout status deployment/app-deployment --timeout=90s
